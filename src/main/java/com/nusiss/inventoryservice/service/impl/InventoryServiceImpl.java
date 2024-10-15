@@ -4,13 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nusiss.inventoryservice.client.UserClient;
+import com.nusiss.inventoryservice.config.ApiResponse;
 import com.nusiss.inventoryservice.domain.entity.Inventory;
 import com.nusiss.inventoryservice.mapper.InventoryMapper;
 
 import com.nusiss.inventoryservice.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Service
@@ -29,12 +36,12 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
      * @param availableStock
      */
     @Override
-    public void save(Long productId, int availableStock) {
+    public void save(String authToken, Long productId, int availableStock) {
         Inventory inventory = new Inventory();
         inventory.setProductId(productId);
         inventory.setAvailableStock(availableStock);
-        inventory.setCreateUser(userClient.queryCurrentUser());
-        inventory.setUpdateUser(userClient.queryCurrentUser());
+        inventory.setCreateUser(queryCurrentUser(authToken) );
+        inventory.setUpdateUser(queryCurrentUser(authToken) );
 
         inventoryMapper.insert(inventory);
     }
@@ -72,12 +79,15 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
      * @param availableStock
      */
     @Override
-    public void update(Long productId, int availableStock) {
+    public void update(String authToken, Long productId, int availableStock) {
         UpdateWrapper<Inventory> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("product_id", productId);
         Inventory inventory = new Inventory();
         inventory.setAvailableStock(availableStock);
-        update(inventory, updateWrapper);
+        inventory.setCreateUser(queryCurrentUser(authToken) );
+        inventory.setUpdateUser(queryCurrentUser(authToken) );
+        inventory.setUpdateDatetime(Timestamp.valueOf(LocalDateTime.now()));
+        inventoryMapper.update(inventory, updateWrapper);
     }
 
     /**
@@ -102,9 +112,36 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     public Boolean deductStock(Long productId, Integer num) {
         int availableStock = query(productId);
         if(availableStock >= num) {
-            update(productId, availableStock - num);
+            UpdateWrapper<Inventory> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("product_id", productId);
+            Inventory inventory = new Inventory();
+            inventory.setAvailableStock(availableStock - num);
+            inventoryMapper.update(inventory, updateWrapper);
             return true;
         }
         return false;
     }
+
+    /**
+     * get user
+     * @param authToken
+     * @return
+     */
+    public String queryCurrentUser(String authToken) {
+        ResponseEntity<ApiResponse<User>> res = userClient.getCurrentUserInfo(authToken);
+        // Check the response status code
+        if (res.getStatusCode() == HttpStatus.OK) {
+            // Get the ApiResponse object
+            ApiResponse<User> apiResponse = res.getBody();
+
+            // Check if apiResponse is not null and extract the User object
+            if (apiResponse != null) {
+                User user = apiResponse.getData();
+                return user.getUsername();
+            }
+            return "system";
+        }
+        return "system";
+    }
+
 }

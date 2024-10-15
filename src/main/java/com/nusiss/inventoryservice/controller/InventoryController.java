@@ -1,7 +1,7 @@
 package com.nusiss.inventoryservice.controller;
 
 import com.nusiss.inventoryservice.service.InventoryService;
-import com.nusiss.inventoryservice.result.Result;
+import com.nusiss.inventoryservice.config.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +24,10 @@ public class InventoryController {
      */
     @PostMapping
     @Operation(summary = "add inventory")
-    public Result<String> save(Long productId, int availableStock){
+    public ApiResponse<String> save(@RequestHeader("authToken") String authToken, Long productId, int availableStock){
         log.info("add inventory：productId{},stock{}", productId, availableStock);
-        inventoryService.save(productId, availableStock);
-        return Result.success();
+        inventoryService.save(authToken, productId, availableStock);
+        return ApiResponse.success();
     }
 
     /**
@@ -50,10 +50,10 @@ public class InventoryController {
      */
     @DeleteMapping
     @Operation(summary = "delete inventory")
-    public Result<String> deleteById(Long productId){
+    public ApiResponse<String> deleteById(Long productId){
         log.info("delete productId{}", productId);
         inventoryService.delete(productId);
-        return Result.success();
+        return ApiResponse.success();
     }
 
     /**
@@ -64,10 +64,10 @@ public class InventoryController {
      */
     @PutMapping
     @Operation(summary = "update")
-    public Result<String> update(Long productId, int availableStock){
+    public ApiResponse<String> update(@RequestHeader("authToken") String authToken, Long productId, int availableStock){
         log.info("update productId{}, availableStock{}", productId, availableStock);
-        inventoryService.update(productId, availableStock);
-        return Result.success();
+        inventoryService.update(authToken, productId, availableStock);
+        return ApiResponse.success();
     }
 
     @PutMapping("/deduct")

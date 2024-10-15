@@ -7,7 +7,7 @@ public interface InventoryService {
      * @param productId
      * @param availableStock
      */
-    void save(Long productId, int availableStock);
+    void save(String authToken, Long productId, int availableStock);
 
     /**
      * query by productId
@@ -27,7 +27,7 @@ public interface InventoryService {
      * @param productId
      * @param availableStock
      */
-    void update(Long productId, int availableStock);
+    void update(String authToken, Long productId, int availableStock);
 
     /**
      * check if the stock number is available for order

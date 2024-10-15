@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 
 @Data
@@ -38,10 +39,10 @@ public class Inventory {
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "create_datetime")
-    private Instant createDatetime;
+    private Timestamp createDatetime;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "update_datetime")
-    private Instant updateDatetime;
+    private Timestamp updateDatetime;
 
 }
