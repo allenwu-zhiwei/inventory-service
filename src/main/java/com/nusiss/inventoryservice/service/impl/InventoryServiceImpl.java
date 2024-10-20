@@ -43,6 +43,8 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
         inventory.setAvailableStock(availableStock);
         inventory.setCreateUser(queryCurrentUser(authToken) );
         inventory.setUpdateUser(queryCurrentUser(authToken) );
+        inventory.setCreateDatetime(Timestamp.valueOf(LocalDateTime.now()));
+        inventory.setUpdateDatetime(Timestamp.valueOf(LocalDateTime.now()));
 
         inventoryMapper.insert(inventory);
     }
@@ -71,7 +73,7 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     public void delete(Long productId) {
         QueryWrapper<Inventory> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("product_id", productId);
-        remove(queryWrapper);
+        inventoryMapper.delete(queryWrapper);
     }
 
     /**
