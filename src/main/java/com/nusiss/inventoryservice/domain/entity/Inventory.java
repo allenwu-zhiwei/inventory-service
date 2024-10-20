@@ -1,5 +1,7 @@
 package com.nusiss.inventoryservice.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,6 +18,7 @@ import java.time.Instant;
 @Table(name = "inventory")
 public class Inventory {
     @Id
+    @TableId(type= IdType.AUTO)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "inventory_id", nullable = false)
     private Long inventoryId;

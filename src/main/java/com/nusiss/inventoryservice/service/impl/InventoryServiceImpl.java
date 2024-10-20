@@ -3,18 +3,19 @@ package com.nusiss.inventoryservice.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.nusiss.inventoryservice.client.UserClient;
-import com.nusiss.inventoryservice.config.ApiResponse;
+import com.nusiss.commonservice.feign.UserFeignClient;
 import com.nusiss.inventoryservice.domain.entity.Inventory;
 import com.nusiss.inventoryservice.mapper.InventoryMapper;
 
 import com.nusiss.inventoryservice.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.nusiss.commonservice.entity.User;
+import com.nusiss.commonservice.config.ApiResponse;
+
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     @Autowired
     private InventoryMapper inventoryMapper;
     @Autowired
-    private UserClient userClient;
+    private UserFeignClient userClient;
 
 
     /**
