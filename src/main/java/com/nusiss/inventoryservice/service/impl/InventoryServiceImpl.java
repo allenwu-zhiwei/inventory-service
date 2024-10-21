@@ -126,6 +126,22 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     }
 
     /**
+     * add num stock for product
+     * @param productId
+     * @param num
+     * @return
+     */
+    @Override
+    public Boolean addStock(Long productId, Integer num) {
+        int availableStock = query(productId);
+        UpdateWrapper<Inventory> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("product_id", productId);
+        Inventory inventory = new Inventory();
+        inventory.setAvailableStock(availableStock + num);
+        return inventoryMapper.update(inventory, updateWrapper) > 0;
+    }
+
+    /**
      * get user
      * @param authToken
      * @return

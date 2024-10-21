@@ -44,4 +44,12 @@ public interface InventoryService {
      * @return
      */
     public Boolean deductStock(Long productId, Integer num);
+
+    /**
+     * addStock when rollback
+     * @param productId
+     * @param num
+     * @return
+     */
+    public Boolean addStock(Long productId, Integer num);
 }

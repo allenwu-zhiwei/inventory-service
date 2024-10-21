@@ -84,4 +84,11 @@ public class InventoryController {
         return inventoryService.checkStock(productId, num);
     }
 
+    @PutMapping("/compensate")
+    @Operation(summary = "add stock if process failed")
+    public Boolean compensateStock(Long productId, Integer num){
+        log.info("process failed, rollback stock. productId{}, num{}", productId, num);
+        return inventoryService.addStock(productId, num);
+    }
+
 }
