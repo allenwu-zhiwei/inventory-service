@@ -174,24 +174,34 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
 
     /**
      * notification
-     * @param param
+     * @param
      */
-    @RabbitListener(queues = RabbitConfig.ORDER_CREATED_QUEUE)
-    public void handleOrderMessage(InventoryMessage param) {
-        log.info("notification to inventory...");
-        Long productId = param.getProductId();
-        int num = param.getQuantity();
+    @RabbitListener(queues = RabbitConfig.INVENTORY_QUEUE)
+    public void handleOrderMessage(InventoryMessage inventoryMessage) {
 
-        if (checkStock(productId, num)) {
-
+        // Long productId = Long.valueOf((String) param.get(0));
+        // Integer num = Integer.valueOf((String) param.get(1));
+        //
+        // if (checkStock(productId, num)) {
+        //
+        //     deductStock(productId, num);
+        //
+        //     rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.order", true);
+        // } else {
+        //
+        //     rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.order", false);
+        // }
+        Long productId = inventoryMessage.getProductId();
+        Integer num = inventoryMessage.getQuantity();
+        if(checkStock(productId, num)){
             deductStock(productId, num);
-
-            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.order", true);
-        } else {
-
-            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.order", false);
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.success", inventoryMessage);
+            System.out.println("发送确认消息: " + inventoryMessage);
+        }else {
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.failure", inventoryMessage);
+            System.out.println("发送回滚消息: " + inventoryMessage);
         }
-    }
 
+    }
 
 }
