@@ -4,21 +4,26 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nusiss.commonservice.feign.UserFeignClient;
+import com.nusiss.inventoryservice.config.RabbitConfig;
 import com.nusiss.inventoryservice.domain.entity.Inventory;
 import com.nusiss.inventoryservice.mapper.InventoryMapper;
 
 import com.nusiss.inventoryservice.service.InventoryService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.nusiss.commonservice.entity.User;
 import com.nusiss.commonservice.config.ApiResponse;
+import org.springframework.util.CollectionUtils;
 
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -29,6 +34,8 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
     private InventoryMapper inventoryMapper;
     @Autowired
     private UserFeignClient userClient;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     /**
@@ -162,5 +169,28 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
         }
         return "system";
     }
+
+
+    /**
+     * notification
+     * @param param
+     */
+    @RabbitListener(queues = RabbitConfig.INVENTORY_QUEUE)
+    public void handleOrderMessage(List<Object> param) {
+
+        Long productId = Long.valueOf((String) param.get(0));
+        Integer num = Integer.valueOf((String) param.get(1));
+
+        if (checkStock(productId, num)) {
+
+            deductStock(productId, num);
+
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.order", true);
+        } else {
+
+            rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.order", false);
+        }
+    }
+
 
 }

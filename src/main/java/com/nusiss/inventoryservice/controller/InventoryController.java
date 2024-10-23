@@ -70,17 +70,19 @@ public class InventoryController {
         return ApiResponse.success();
     }
 
-    @PutMapping("/deduct")
+    @PutMapping("/deduct/{productId}/{num}")
     @Operation(summary = "deduct stock after order success")
-    public Boolean deductStock(Long productId, Integer num){
+    public Boolean deductStock(@PathVariable("productId") Long productId,@PathVariable("num")  Integer num){
         log.info("deduct stock productId{}, num{}", productId, num);
         return inventoryService.deductStock(productId, num);
     }
 
-    @GetMapping("/check")
+    @GetMapping("/check/{productId}/{num}")
     @Operation(summary = "check stock for order")
-    public Boolean checkStock(Long productId, int num){
+    public Boolean checkStock(@PathVariable("productId") Long productId,@PathVariable("num") Integer num){
         log.info("check stock productId{}, num{}", productId, num);
+
+
         return inventoryService.checkStock(productId, num);
     }
 
