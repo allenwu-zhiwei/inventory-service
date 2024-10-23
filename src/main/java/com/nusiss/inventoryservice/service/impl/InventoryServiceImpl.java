@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.nusiss.commonservice.feign.UserFeignClient;
 import com.nusiss.inventoryservice.config.RabbitConfig;
+import com.nusiss.inventoryservice.domain.dto.InventoryMessage;
 import com.nusiss.inventoryservice.domain.entity.Inventory;
 import com.nusiss.inventoryservice.mapper.InventoryMapper;
 
@@ -175,11 +176,11 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
      * notification
      * @param param
      */
-    @RabbitListener(queues = RabbitConfig.INVENTORY_QUEUE)
-    public void handleOrderMessage(List<Object> param) {
-
-        Long productId = Long.valueOf((String) param.get(0));
-        Integer num = Integer.valueOf((String) param.get(1));
+    @RabbitListener(queues = RabbitConfig.ORDER_CREATED_QUEUE)
+    public void handleOrderMessage(InventoryMessage param) {
+        log.info("notification to inventory...");
+        Long productId = param.getProductId();
+        int num = param.getQuantity();
 
         if (checkStock(productId, num)) {
 
