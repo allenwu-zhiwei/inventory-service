@@ -196,10 +196,10 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
         if(checkStock(productId, num)){
             deductStock(productId, num);
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.success", inventoryMessage);
-            System.out.println("发送确认消息: " + inventoryMessage);
+            log.info("send confirm info {}", inventoryMessage);
         }else {
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.failure", inventoryMessage);
-            System.out.println("发送回滚消息: " + inventoryMessage);
+            log.info("send rollback info {}", inventoryMessage);
         }
 
     }

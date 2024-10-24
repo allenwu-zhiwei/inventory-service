@@ -21,7 +21,6 @@ public class RabbitConfig {
     public static final String CONFIRM_QUEUE = "confirm.queue";
     public static final String ROLLBACK_QUEUE = "rollback.queue";
     public static final String EXCHANGE = "order.exchange";
-    public static final String ORDER_CREATED_QUEUE = "order.created.queue";
 
     @Bean
     public Queue orderQueue() {
@@ -41,11 +40,6 @@ public class RabbitConfig {
     @Bean
     public Queue rollbackQueue() {
         return new Queue(ROLLBACK_QUEUE, true);
-    }
-
-    @Bean
-    public Queue orderCreatedQueue() { // 新增队列的 bean
-        return new Queue(ORDER_CREATED_QUEUE, true);
     }
 
     @Bean
@@ -71,11 +65,6 @@ public class RabbitConfig {
     @Bean
     public Binding rollbackBinding(Queue rollbackQueue, TopicExchange exchange) {
         return BindingBuilder.bind(rollbackQueue).to(exchange).with("rollback.*");
-    }
-
-    @Bean
-    public Binding orderCreatedBinding(Queue orderCreatedQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(orderCreatedQueue).to(exchange).with("order.created"); // 绑定新队列
     }
 
     @Bean
