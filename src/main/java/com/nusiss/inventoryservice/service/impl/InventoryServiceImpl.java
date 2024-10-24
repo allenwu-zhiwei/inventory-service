@@ -178,19 +178,7 @@ public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory
      */
     @RabbitListener(queues = RabbitConfig.INVENTORY_QUEUE)
     public void handleOrderMessage(InventoryMessage inventoryMessage) {
-
-        // Long productId = Long.valueOf((String) param.get(0));
-        // Integer num = Integer.valueOf((String) param.get(1));
-        //
-        // if (checkStock(productId, num)) {
-        //
-        //     deductStock(productId, num);
-        //
-        //     rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "confirm.order", true);
-        // } else {
-        //
-        //     rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, "rollback.order", false);
-        // }
+        log.info("notify inventory message: {}", inventoryMessage);
         Long productId = inventoryMessage.getProductId();
         Integer num = inventoryMessage.getQuantity();
         if(checkStock(productId, num)){
