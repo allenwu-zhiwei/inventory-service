@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.nusiss.commonservice.entity.User;
 import com.nusiss.commonservice.config.ApiResponse;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 import java.sql.Timestamp;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@CrossOrigin(origins = "http://localhost:5000")
 public class InventoryServiceImpl extends ServiceImpl<InventoryMapper, Inventory> implements InventoryService {
 
     @Autowired
