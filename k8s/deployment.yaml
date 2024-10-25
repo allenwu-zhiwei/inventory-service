@@ -16,7 +16,7 @@ spec:
         - name: inventory-service
           image: alllenwu249/inventory-service:latest
           ports:
-            - containerPort: 8087
+            - containerPort: 8083
           resources:
             requests:
               cpu: "200m"
