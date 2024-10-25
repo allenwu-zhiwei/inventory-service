@@ -7,6 +7,6 @@ spec:
   selector:
     app: inventory-service
   ports:
-    - port: 8087
-      targetPort: 8087
-      nodePort: 30001
+    - port: 8083
+      targetPort: 8083
+      nodePort: 30083
