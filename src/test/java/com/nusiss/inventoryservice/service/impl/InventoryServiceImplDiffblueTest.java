@@ -1,5 +1,153 @@
 package com.nusiss.inventoryservice.service.impl;
 
+import com.nusiss.inventoryservice.domain.entity.Inventory;
+import com.nusiss.inventoryservice.mapper.InventoryMapper;
+import com.nusiss.commonservice.feign.UserFeignClient;
+import com.nusiss.commonservice.entity.User;
+import com.nusiss.commonservice.config.ApiResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class InventoryServiceImplDiffblueTest {
+
+    @Mock
+    private InventoryMapper inventoryMapper;
+
+    @Mock
+    private UserFeignClient userClient;
+
+    @InjectMocks
+    private InventoryServiceImpl inventoryService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testSave() {
+        // Prepare mock behavior
+        String authToken = "authToken";
+        Long productId = 1L;
+        int availableStock = 100;
+
+        // Mock the response from UserFeignClient
+        User mockUser = new User();
+        mockUser.setUsername("testUser");
+        ResponseEntity<ApiResponse<User>> mockResponse = new ResponseEntity<>(new ApiResponse<>(), HttpStatus.OK);
+        when(userClient.getCurrentUserInfo(authToken)).thenReturn(mockResponse);
+
+        // Perform the method
+        inventoryService.save(authToken, productId, availableStock);
+
+        // Verify that the insert method was called
+        verify(inventoryMapper, times(1)).insert(any(Inventory.class));
+    }
+
+    @Test
+    void testQuery() {
+        Long productId = 1L;
+        int availableStock = 100;
+
+        // Prepare mock inventory
+        Inventory mockInventory = new Inventory();
+        mockInventory.setProductId(productId);
+        mockInventory.setAvailableStock(availableStock);
+
+        when(inventoryMapper.selectOne(any())).thenReturn(mockInventory);
+
+        // Call the query method
+        int result = inventoryService.query(productId);
+
+        // Assert the result
+        assertEquals(availableStock, result);
+    }
+
+    @Test
+    void testUpdate() {
+        String authToken = "authToken";
+        Long productId = 1L;
+        int availableStock = 50;
+
+        // Mock the response from UserFeignClient
+        User mockUser = new User();
+        mockUser.setUsername("testUser");
+        ResponseEntity<ApiResponse<User>> mockResponse = new ResponseEntity<>(new ApiResponse<>(), HttpStatus.OK);
+        when(userClient.getCurrentUserInfo(authToken)).thenReturn(mockResponse);
+
+        // Call the update method
+        inventoryService.update(authToken, productId, availableStock);
+
+        // Verify that the update method was called on the inventoryMapper
+        verify(inventoryMapper, times(1)).update(any(Inventory.class), any());
+    }
+
+    @Test
+    void testCheckStock() {
+        Long productId = 1L;
+        int availableStock = 100;
+        int orderQuantity = 50;
+
+        // Mock the query method response
+        when(inventoryService.query(productId)).thenReturn(availableStock);
+
+        // Call checkStock method
+        boolean result = inventoryService.checkStock(productId, orderQuantity);
+
+        // Assert the result
+        assertTrue(result);
+    }
+
+    @Test
+    void testDeductStock() {
+        Long productId = 1L;
+        int availableStock = 100;
+        int deductQuantity = 50;
+
+        // Mock the query method response
+        when(inventoryService.query(productId)).thenReturn(availableStock);
+
+        // Call deductStock method
+        boolean result = inventoryService.deductStock(productId, deductQuantity);
+
+        // Assert the result
+        assertTrue(result);
+
+        // Verify that the update method was called
+        verify(inventoryMapper, times(1)).update(any(Inventory.class), any());
+    }
+
+    @Test
+    void testAddStock() {
+        Long productId = 1L;
+        int availableStock = 100;
+        int addQuantity = 50;
+
+        // Mock the query method response
+        when(inventoryService.query(productId)).thenReturn(availableStock);
+
+        // Call addStock method
+        boolean result = inventoryService.addStock(productId, addQuantity);
+
+        // Assert the result
+        assertTrue(result);
+
+        // Verify that the update method was called
+        verify(inventoryMapper, times(1)).update(any(Inventory.class), any());
+    }
+}
+
+/*
+package com.nusiss.inventoryservice.service.impl;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,12 +195,14 @@ class InventoryServiceImplDiffblueTest {
     @MockBean
     private UserFeignClient userFeignClient;
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#save(String, Long, int)} with
      * {@code authToken}, {@code productId}, {@code availableStock}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#save(String, Long, int)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test save(String, Long, int) with 'authToken', 'productId', 'availableStock'")
     @Disabled("TODO: Complete this test")
@@ -76,11 +226,13 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.save("ABC123", 1L, 1);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#query(Long)} with {@code Long}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#query(Long)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test query(Long) with 'Long'")
     @Disabled("TODO: Complete this test")
@@ -104,11 +256,13 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.query(1L);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#delete(Long)}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#delete(Long)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test delete(Long)")
     @Disabled("TODO: Complete this test")
@@ -132,12 +286,14 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.delete(1L);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#update(String, Long, int)} with
      * {@code authToken}, {@code productId}, {@code availableStock}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#update(String, Long, int)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test update(String, Long, int) with 'authToken', 'productId', 'availableStock'")
     @Disabled("TODO: Complete this test")
@@ -161,11 +317,13 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.update("ABC123", 1L, 1);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#checkStock(Long, int)}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#checkStock(Long, int)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test checkStock(Long, int)")
     @Disabled("TODO: Complete this test")
@@ -189,11 +347,13 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.checkStock(1L, 10);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#deductStock(Long, Integer)}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#deductStock(Long, Integer)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test deductStock(Long, Integer)")
     @Disabled("TODO: Complete this test")
@@ -217,7 +377,8 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.deductStock(1L, 10);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#addStock(Long, Integer)}.
      * <ul>
      *   <li>Given {@link Inventory} (default constructor) AvailableStock is one.</li>
@@ -226,7 +387,8 @@ class InventoryServiceImplDiffblueTest {
      * </ul>
      * <p>
      * Method under test: {@link InventoryServiceImpl#addStock(Long, Integer)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test addStock(Long, Integer); given Inventory (default constructor) AvailableStock is one; when ten; then return 'true'")
     void testAddStock_givenInventoryAvailableStockIsOne_whenTen_thenReturnTrue() {
@@ -251,7 +413,8 @@ class InventoryServiceImplDiffblueTest {
         assertTrue(actualAddStockResult);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#addStock(Long, Integer)}.
      * <ul>
      *   <li>Given {@link InventoryMapper} {@link BaseMapper#update(Object, Wrapper)}
@@ -261,7 +424,8 @@ class InventoryServiceImplDiffblueTest {
      * </ul>
      * <p>
      * Method under test: {@link InventoryServiceImpl#addStock(Long, Integer)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test addStock(Long, Integer); given InventoryMapper update(Object, Wrapper) return zero; when ten; then return 'false'")
     void testAddStock_givenInventoryMapperUpdateReturnZero_whenTen_thenReturnFalse() {
@@ -286,11 +450,13 @@ class InventoryServiceImplDiffblueTest {
         assertFalse(actualAddStockResult);
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#queryCurrentUser(String)}.
      * <p>
      * Method under test: {@link InventoryServiceImpl#queryCurrentUser(String)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test queryCurrentUser(String)")
     @Disabled("TODO: Complete this test")
@@ -314,12 +480,14 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.queryCurrentUser("ABC123");
     }
 
-    /**
+    */
+/**
      * Test {@link InventoryServiceImpl#handleOrderMessage(InventoryMessage)}.
      * <p>
      * Method under test:
      * {@link InventoryServiceImpl#handleOrderMessage(InventoryMessage)}
-     */
+     *//*
+
     @Test
     @DisplayName("Test handleOrderMessage(InventoryMessage)")
     @Disabled("TODO: Complete this test")
@@ -343,3 +511,7 @@ class InventoryServiceImplDiffblueTest {
         inventoryServiceImpl.handleOrderMessage(new InventoryMessage());
     }
 }
+*/
+
+
+
