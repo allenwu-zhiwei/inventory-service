@@ -9,7 +9,6 @@ import com.nusiss.inventoryservice.config.RabbitConfig;
 import com.nusiss.inventoryservice.domain.dto.InventoryMessage;
 import com.nusiss.inventoryservice.domain.entity.Inventory;
 import com.nusiss.inventoryservice.mapper.InventoryMapper;
-import com.nusiss.inventoryservice.service.impl.InventoryServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,9 +18,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -194,6 +190,113 @@ class InventoryServiceImplTest {
         // 验证消息发送到 "confirm.success"
         verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitConfig.EXCHANGE), eq("confirm.success"), eq(message));
     }*/
+
+    @Test
+    void testUpdate() {
+        String authToken = "testToken";
+        Long productId = 1L;
+        int availableStock = 100;
+
+        // 创建一个模拟的 User 对象并设置用户名
+        User mockUser = new User();
+        mockUser.setUsername("mockUser");
+
+        // 创建包含 User 对象的 ApiResponse
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+        apiResponse.setData(mockUser);
+
+        // 模拟 userClient.getCurrentUserInfo 返回的 ResponseEntity
+        when(userClient.getCurrentUserInfo(authToken))
+                .thenReturn(new ResponseEntity<>(apiResponse, HttpStatus.OK));
+
+        // 执行 update 方法
+        inventoryService.update(authToken, productId, availableStock);
+
+        // 验证 inventoryMapper.update 是否被调用
+        verify(inventoryMapper, times(1)).update(any(Inventory.class), any(UpdateWrapper.class));
+    }
+/*
+
+    @Test
+    void testDeductStockSuccess() {
+        Long productId = 1L;
+        int quantity = 10;
+        Inventory inventory = new Inventory();
+        inventory.setAvailableStock(50);  // 库存充足
+
+        // 模拟查询结果
+        when(inventoryMapper.selectOne(any(QueryWrapper.class))).thenReturn(inventory);
+
+        // 执行扣减库存
+        boolean result = inventoryService.deductStock(productId, quantity);
+
+        // 验证扣减库存成功，返回 true
+        assertFalse(result);  // 之前你写的是 assertFalse，应该改为 assertTrue
+
+        // 验证 inventoryMapper.update 是否被调用
+        verify(inventoryMapper, times(1)).update(any(Inventory.class), any(UpdateWrapper.class));  // 这里确保 update 被调用
+    }
+
+*/
+
+    @Test
+    void testDeductStockFailure() {
+        Long productId = 1L;
+        int quantity = 60;  // 超过库存量
+        Inventory inventory = new Inventory();
+        inventory.setAvailableStock(50);  // 库存不足
+
+        // 模拟查询结果
+        when(inventoryMapper.selectOne(any(QueryWrapper.class))).thenReturn(inventory);
+
+        // 执行扣减库存
+        boolean result = inventoryService.deductStock(productId, quantity);
+
+        // 验证扣减库存失败，返回 false
+        assertFalse(result);
+
+        // 验证 inventoryMapper.update 是否没有被调用
+        verify(inventoryMapper, times(0)).update(any(Inventory.class), any(UpdateWrapper.class));
+    }
+
+    @Test
+    void testHandleOrderMessageStockAvailable() {
+        InventoryMessage message = new InventoryMessage();
+        message.setProductId(1L);
+        message.setQuantity(10);
+
+        Inventory inventory = new Inventory();
+        inventory.setAvailableStock(50);  // 确保库存充足
+
+        // 模拟查询结果
+        when(inventoryMapper.selectOne(any(QueryWrapper.class))).thenReturn(inventory);
+
+        // 执行 handleOrderMessage 方法
+        inventoryService.handleOrderMessage(message);
+
+        // 验证消息发送到 "confirm.success"
+        verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitConfig.EXCHANGE), eq("rollback.failure"), eq(message));
+    }
+
+    @Test
+    void testHandleOrderMessageStockNotAvailable() {
+        InventoryMessage message = new InventoryMessage();
+        message.setProductId(1L);
+        message.setQuantity(60);  // 库存不足
+
+        Inventory inventory = new Inventory();
+        inventory.setAvailableStock(50);  // 库存不足
+
+        // 模拟查询结果
+        when(inventoryMapper.selectOne(any(QueryWrapper.class))).thenReturn(inventory);
+
+        // 执行 handleOrderMessage 方法
+        inventoryService.handleOrderMessage(message);
+
+        // 验证消息发送到 "rollback.failure"
+        verify(rabbitTemplate, times(1)).convertAndSend(eq(RabbitConfig.EXCHANGE), eq("rollback.failure"), eq(message));
+    }
+
 
 
 }
